@@ -9,7 +9,9 @@ error_log('script start');
 require_once QA_PLUGIN_DIR.'q2a-similar-tag-widget/similar-tag-db.php';
 $start = microtime(true);
 if (qa_using_tags()) {
-	// error_log('処理件数: ' . $count);
+	$stdb = new similar_tag_db();;
+	$cnt = $stdb->update_all_similar_gats();
+	error_log('処理件数: ' . $cnt);
 }
 $end = microtime(true);
 error_log("処理時間：" . ($end - $start) . "秒");
