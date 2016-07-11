@@ -2,7 +2,10 @@
 
 class similar_tag_db
 {
-	const SIMILAR_TAGS = 'similar_tags';
+	const SIMILAR_TAG_IDS = 'similar_tag_ids';
+	const SIMILAR_TAG_WORDS = 'similar_tag_words';
+	const WORDID = 'wordid';
+	const WORD = 'word';
 	const SIMILAR_COUNT = 5;
 
 	/**
@@ -22,18 +25,18 @@ class similar_tag_db
 	}
 
 	/**
-	 * 類似タグをMETAテーブルから取得
-	 * @param  int $wordid タグのwordid
+	 * 類似タグWORDをMETAテーブルから取得
+	 * @param  string $word タグのword
 	 * @return string        類似タグ、カンマ区切り
 	 */
-	public function get_similar_tag_metas($wordid)
+	public function get_similar_tag_words($word)
 	{
 		$sql = "SELECT content
 FROM ^tagmetas
 WHERE tag=$ AND title=$
 ";
 
-		return qa_db_read_one_value(qa_db_query_sub($sql, $wordid, self::SIMILAR_TAGS));
+		return qa_db_read_one_value(qa_db_query_sub($sql, $word, self::SIMILAR_TAG_WORDS));
 	}
 
 	/**
@@ -44,17 +47,22 @@ WHERE tag=$ AND title=$
 	 */
 	public function get_similar_tags($wordid, $cnt)
 	{
-		$sql = "SELECT wordid
-FROM ^posttags
-WHERE postid in (
+		$result = array();
+
+		$sql = "SELECT w.word
+FROM ^posttags as p
+INNER JOIN ^words as w
+ON p.wordid = w.wordid
+WHERE p.postid in (
 SELECT postid FROM ^posttags WHERE wordid = #
 )
-AND wordid != #
-GROUP BY wordid
-ORDER BY count(wordid) DESC
+AND p.wordid != #
+GROUP BY p.wordid
+ORDER BY count(p.wordid) DESC
 LIMIT #";
 
 		return qa_db_read_all_values(qa_db_query_sub($sql, $wordid, $wordid, $cnt));
+
 	}
 
 	/**
@@ -64,11 +72,14 @@ LIMIT #";
 	 */
 	public function set_similar_tags($wordid, $tags)
 	{
-		if(isset($wordid) && count($tags) > 0) {
-			if ($this->exists_similar_tags($wordid)) {
-				$this->update_similar_tags($wordid, $tags);
-			} else {
-				$this->create_similar_tags($wordid, $tags);
+		if(isset($wordid)) {
+			$word = $this->wordid_to_word($wordid);
+			if (count($tags) > 0) {
+				if ($this->exists_similar_tags_meta($word, self::SIMILAR_TAG_WORDS)) {
+					$this->update_similar_tags($word, self::SIMILAR_TAG_WORDS, $tags);
+				} else {
+					$this->create_similar_tags($word, self::SIMILAR_TAG_WORDS, $tags);
+				}
 			}
 		}
 	}
@@ -90,13 +101,13 @@ LIMIT #";
 	 * @param  int $wordid タグのwordid
 	 * @param  array $tags 類似タグのwordid
 	 */
-	private function create_similar_tags($wordid, $tags)
+	private function create_similar_tags($wordid, $title, $tags)
 	{
 		qa_db_query_sub(
 			"INSERT INTO ^tagmetas (tag, title, content)
 VALUES ($, $, $)
 ",
-			$wordid, self::SIMILAR_TAGS, implode(',', $tags)
+			$wordid, $title, implode(',', $tags)
 		);
 
 	}
@@ -106,14 +117,14 @@ VALUES ($, $, $)
 	 * @param  int $wordid タグのwordid
 	 * @param  array $tags   類似タグのwordidon]
 	 */
-	private function update_similar_tags($wordid, $tags)
+	private function update_similar_tags($wordid, $title, $tags)
 	{
 		qa_db_query_sub(
 			"UPDATE ^tagmetas
 SET content=$
 WHERE tag=$ AND title=$
 ",
-			implode(',', $tags), $wordid, self::SIMILAR_TAGS
+			implode(',', $tags), $wordid, $title
 		);
 	}
 
@@ -122,16 +133,30 @@ WHERE tag=$ AND title=$
 	 * @param  int $wordid タグのwordid
 	 * @return boolean         保存されていればtrue
 	 */
-	private function exists_similar_tags($wordid)
+	private function exists_similar_tags_meta($wordid, $title)
 	{
 		$sql = "SELECT count(*) as cnt
 FROM ^tagmetas WHERE tag = $ AND title = $
 ";
-		$result = qa_db_read_one_value(qa_db_query_sub($sql, $wordid, self::SIMILAR_TAGS));
+		$result = qa_db_read_one_value(qa_db_query_sub($sql, $wordid, $title));
 		if (isset($result) && $result > 0) {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * wordidでwordを取得
+	 * @param  int $wordid wordid
+	 * @return string         word
+	 */
+	private function wordid_to_word($wordid = null)
+	{
+		if (!isset($wordid)) return '';
+
+		$sql = "SELECT word FROM ^words WHERE wordid = #";
+
+		return qa_db_read_one_value(qa_db_query_sub($sql, $wordid));
 	}
 
 }
