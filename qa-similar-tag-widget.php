@@ -22,16 +22,19 @@ class qa_similar_tag_widget {
 		$requests = explode('/', $request);
 		$tag = $requests[1];
 		$stdb = new similar_tag_db();
-		$tags = qa_tagstring_to_tags($stdb->get_similar_tag_words($tag));
+		$tagstring = $stdb->get_similar_tag_words($tag);
+		if(!empty($tagstring)) {
+			$tags = qa_tagstring_to_tags($tagstring);
 
-		$themeobject->output('<div class="qa-q-item-tags"><h4>','関連タグ','</h4>');
-		$themeobject->output('<ul class="qa-q-item-tag-list">');
-		foreach ($tags as $tag) {
-			$themeobject->output('<li class="qa-q-item-tag-item">', $this->add_link($tag), '</li>');
+			$themeobject->output('<div class="qa-q-item-tags"><h4>','関連タグ','</h4>');
+			$themeobject->output('<ul class="qa-q-item-tag-list">');
+			foreach ($tags as $tag) {
+				$themeobject->output('<li class="qa-q-item-tag-item">', $this->add_link($tag), '</li>');
+			}
+			$themeobject->output('</ul>');
+			$themeobject->output('</div>');
+			$themeobject->output('<div class="qa-q-item-clear"></div>');
 		}
-		$themeobject->output('</ul>');
-		$themeobject->output('</div>');
-		$themeobject->output('<div class="qa-q-item-clear"></div>');
 	}
 
 	function add_link($tag) {
