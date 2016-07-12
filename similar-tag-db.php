@@ -35,8 +35,13 @@ class similar_tag_db
 FROM ^tagmetas
 WHERE tag=$ AND title=$
 ";
+		$result = qa_db_query_sub($sql, $word, self::SIMILAR_TAG_WORDS);
+		if ($result->num_rows > 0) {
+			return qa_db_read_one_value($result);
+		} else {
+			return '';
+		}
 
-		return qa_db_read_one_value(qa_db_query_sub($sql, $word, self::SIMILAR_TAG_WORDS));
 	}
 
 	/**
