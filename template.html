@@ -1,0 +1,10 @@
+<div class="qa-q-item-tags"><h4>関連タグ</h4>
+  <ul class="qa-q-item-tag-list">
+  <?php foreach ($tpl->tags as $tag) : ?>
+    <li class="qa-q-item-tag-item">
+      <a href="<?php echo qa_path_html('tag/'.$tag) ?>" ><?php echo $tag; ?></a>
+    </li>
+  <?php endforeach; ?>
+  </ul>
+</div>
+<div class="qa-q-item-clear">

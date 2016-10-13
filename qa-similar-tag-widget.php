@@ -26,23 +26,24 @@ class qa_similar_tag_widget {
 		if(!empty($tagstring)) {
 			$tags = qa_tagstring_to_tags($tagstring);
 
-			$themeobject->output('<div class="qa-q-item-tags"><h4>','関連タグ','</h4>');
-			$themeobject->output('<ul class="qa-q-item-tag-list">');
-			foreach ($tags as $tag) {
-				$themeobject->output('<li class="qa-q-item-tag-item">', $this->add_link($tag), '</li>');
-			}
-			$themeobject->output('</ul>');
-			$themeobject->output('</div>');
-			$themeobject->output('<div class="qa-q-item-clear"></div>');
+			$tpl = new Template();
+			$tpl->tags = $tags;
+			$themeobject->output($tpl->show());
 		}
 	}
+}
 
-	function add_link($tag) {
-		return '<a href="' . qa_path_html('tag/'.$tag) .
-				'" class="qa-tag-link">' .
-				 qa_html($tag) . '</a>';
+/**
+ * my template engine
+ */
+class Template {
+	function show() {
+		$tpl = $this;
+		include(QA_PLUGIN_DIR.'q2a-similar-tag-widget/template.html');
 	}
 }
+
+
 /*
 	Omit PHP closing tag to help avoid accidental output
 */
