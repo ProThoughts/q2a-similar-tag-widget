@@ -1,8 +1,8 @@
 <div class="qa-q-item-tags"><h4>関連タグ</h4>
   <ul class="qa-q-item-tag-list">
   <?php foreach ($tpl->tags as $tag) : ?>
-    <li class="qa-q-item-tag-item">
-      <a href="<?php echo qa_path_html('tag/'.$tag) ?>" ><?php echo $tag; ?></a>
+    <li class="qa-q-item-tag-item mdl-chip">
+      <a class="mdl-chip__text mdl-color-text--grey-900" href="<?php echo qa_path_html('tag/'.$tag) ?>" ><?php echo $tag; ?></a>
     </li>
   <?php endforeach; ?>
   </ul>
