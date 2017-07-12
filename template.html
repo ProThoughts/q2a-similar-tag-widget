@@ -1,10 +1,10 @@
-<div class="qa-q-item-tags"><h4>関連タグ</h4>
-  <ul class="qa-q-item-tag-list">
+<div class="qa-q-item-tags"><h4><?php echo qa_lang_html('similar_tag/widget_title'); ?></h4>
+  <div class="qa-q-item-tag-list">
   <?php foreach ($tpl->tags as $tag) : ?>
-    <li class="qa-q-item-tag-item mdl-chip">
-      <a class="mdl-chip__text mdl-color-text--grey-900" href="<?php echo qa_path_html('tag/'.$tag) ?>" ><?php echo $tag; ?></a>
-    </li>
+    <span class="qa-q-item-tag-item ">
+      <a class="qa-tag-link mdl-button mdl-button--raised mdl-color-text--grey-900" href="<?php echo qa_path_html('tag/'.$tag) ?>" ><?php echo $tag; ?></a>
+    </span>
   <?php endforeach; ?>
-  </ul>
+  </div>
 </div>
 <div class="qa-q-item-clear">
