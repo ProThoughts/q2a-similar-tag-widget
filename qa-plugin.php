@@ -20,3 +20,6 @@ if (!defined('QA_VERSION')) { // don't allow this page to be requested directly 
 
 // widget
 qa_register_plugin_module('widget', 'qa-similar-tag-widget.php', 'qa_similar_tag_widget', 'Similar Tag Widget');
+
+// phrases
+qa_register_plugin_phrases('similar-tag-lang-*.php', 'similar_tag');
